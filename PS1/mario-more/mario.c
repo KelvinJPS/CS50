@@ -10,16 +10,16 @@ do
 { 
    heigth = get_int("Heigth: ");
 }
-while ( heigth<1 || heigth>8 );
+while (heigth<1 || heigth>8);
 
 //rows
  for(int i = 0; i<heigth; i++) 
  {
-    //add spaces for each columns
-    for(int j = heigth; j>i; j--) 
-      {
-         printf(" ");
-      }
+   //add spaces for each column
+    for(int j = heigth -1; j>i; j--) 
+    {
+       printf("#");
+    }
 
    //Add a row to the left 
     printf("#");
@@ -27,10 +27,10 @@ while ( heigth<1 || heigth>8 );
    //For each column  add a  brick
     for(int j = 0; j<i; j++) 
     {
-       printf("#");
+        printf("#");
     }
- //Add a gap between the two pyramids
-   printf("  ");
+   //Add a gap between the two pyramids
+        printf("  ");
    
    //For each column add a brick
     for(int j = 0; j<i; j++) 
