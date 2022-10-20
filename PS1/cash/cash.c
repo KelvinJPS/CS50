@@ -38,36 +38,67 @@ int main(void)
 int get_cents(void)
 {
     int cents = 0;
+
     do 
     { 
-      cents = get_int("how many cents?: ");
+        cents = get_int("how many cents?: ");
 
     }
-    while (cents<1);
+    while (cents < 1);
 
     return cents;
 }
 
 int calculate_quarters(int cents)
 {
-    // TODO
-    return 0;
+    int  quarters = 0;
+    const int QUARTER = 25;
+    while (cents - QUARTER  >= 0) 
+    {
+        quarters += 1; 
+        cents = cents - QUARTER;
+    }
+
+    return quarters;
 }
 
 int calculate_dimes(int cents)
 {
-    // TODO
-    return 0;
+    int dimes = 0;
+    const int DIME = 10;
+
+    while (cents - DIME >= 0)
+    {
+        dimes += 1;
+        cents = cents - DIME;
+    }
+
+    return dimes;
 }
 
 int calculate_nickels(int cents)
 {
-    // TODO
-    return 0;
+    int nickels = 0;
+    const int NICKEL = 5;
+
+    while (cents - NICKEL >= 0)
+    {
+        nickels += 1;
+        cents = cents - NICKEL;
+    }
+    
+    return nickels;
 }
 
 int calculate_pennies(int cents)
 {
-    // TODO
-    return 0;
+    int pennies = 0;
+    const int PENNY = 1; 
+
+    while (cents - 1 >= 0)
+    {
+        pennies += 1;
+        cents = cents - PENNY;
+    }
+    return pennies;
 }
