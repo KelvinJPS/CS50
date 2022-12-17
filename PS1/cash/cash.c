@@ -32,6 +32,7 @@ int main(void)
     int coins = quarters + dimes + nickels + pennies;
 
     // Print total number of coins to give the customer
+    printf("quarters:%i,dimes:%i,nickels:%i,pennies:%i\n",quarters,dimes,nickels,pennies);
     printf("%i\n", coins);
 }
 

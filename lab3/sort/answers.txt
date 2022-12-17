@@ -1,0 +1,11 @@
+sort1 uses:bubble sort
+How do you know?: from the three,it is the fastest with the file sorted.50000.txt.  Omega(n)    
+0m0.067s
+sort2 uses:merge sort
+How do you know?: from thr three, it is the second fastest with the file sorted.50000.txt. Theta(n \log n)  
+real    0m0.073s
+
+sort3 uses:selection sort
+
+How do you know?: is the lowest with the file sorted.50000.txt . Omega(n^2)
+  0m1.963s

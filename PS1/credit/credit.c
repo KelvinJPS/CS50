@@ -3,5 +3,8 @@
 
 int main(void) 
 {
-    
+   int checkifvisa(int creditcardnumber) 
+   {
+     
+   }
 }
