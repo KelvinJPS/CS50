@@ -1,0 +1,18 @@
+# A Program that checks if a number is a valid credit card number
+def main():
+    # Ask user for a credit card number  
+    while True:
+        card_number = input("Number:")
+        if(card_number.isdigit()):
+            break
+
+    checksum(card_number)
+
+def checksum(number):
+    n = 0
+    for i in range(0,len(number)-1, 2):
+      n += (int(number[i]) * 2) % 10 
+
+
+if __name__ == "__main__":
+    main()

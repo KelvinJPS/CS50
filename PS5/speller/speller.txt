@@ -1,0 +1,49 @@
+        TODO 
+1. Load dictionary function.
+2. Check words.
+3. Unload dictionary.
+4. Improve hash function. 
+5. Size function. 
+
+
+Load dictionary. 
+
+Load default dictionary. 
+
+By doing so the perfomance could be improved with the default dictionary by creating an a hash table of static arrays instead of one with a linked list.
+Also allowing binary search, to improve the searching for a word in the dictionry. 
+
+
+The hash table. 
+
+The hash table would consist of 26 buckets/spaces, refering each to the  Alphabet. 
+
+Each bucket would have an array. 
+
+the size of the array is the number of words that the dictionary has with that letter.
+
+so if there is 200 words starting with the letter A that would  the size of the array. 
+
+
+The hash function 
+
+the hash function return the index by looking at the first letter of the word. 
+
+
+Why is not an optimal solution?
+
+What would happen if a word is added to the dictionary? 
+
+The program would have to calculate, again, how many words are in the new dictionary and would have to add to the each array an space for the new word. 
+
+The counting is linear. 
+
+it wouldn't be able to load dictionaries from any size. 
+
+
+The general load function 
+ |
+
+
+
+
