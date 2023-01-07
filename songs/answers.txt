@@ -1,0 +1,9 @@
+If songs.db contains the top 100 songs of one listener from 2018, how would you characterize their audio aura?
+
+Hypothesize about why the way you’ve calculated this aura might not be very representative of the listener. What better ways of calculating this aura would you propose?
+
+so to characterize the audio's aura of the a listener, I could categorize each one depending of the energy : the less are blue
+depending of the danceability the more more orange, purple so I would average energy, valence, and danceability. 
+
+
+It may not be representative. Because for example if I use spotify only to listen to music for focus/study I would be in the yellow category and it would be kind of wrong
