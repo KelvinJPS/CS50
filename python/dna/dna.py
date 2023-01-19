@@ -11,11 +11,11 @@ def main():
 
     # Check database for matching profiles
     with open(sys.argv[1]) as csvfile:
-        readerdna = csv.reader(csvfile) 
-        # Read DNA sequence file into a variables 
-        f = open(sys.argv[2]) 
+        readerdna = csv.reader(csvfile)
+        # Read DNA sequence file into a variables
+        f = open(sys.argv[2])
         sequence = f.read()
-        # Find longest match of each STR in DNA sequence 
+        # Find longest match of each STR in DNA sequence
         matches = []
         header = next(readerdna)
         for i in range(1, len(header)):
@@ -26,8 +26,7 @@ def main():
             db_matches = [int(x) for x in row[1:]]
             if sorted(db_matches) == sorted(matches):
                 print(row[0])
-                return 
-            
+                return
         print("No match")
 
 
