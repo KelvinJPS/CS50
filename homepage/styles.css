@@ -1,0 +1,36 @@
+body {
+
+  background-color: #1a1b26;
+  color: white;
+}
+
+h2 {
+  margin-left: 5%;
+}
+
+h2+p {
+  margin-inline: 5% 10%;
+  font-size: 120%;
+
+}
+
+a:visited {
+  color: pink;
+}
+
+blockquote {
+  font-size: 150%;
+  margin-inline: 10%;
+}
+
+q {
+  font-size: 150%;
+  margin-inline: 5%;
+}
+
+li {
+  list-style-type: none;
+  font-size: 150%;
+  margin-inline: 5%;
+
+}

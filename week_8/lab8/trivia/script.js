@@ -1,7 +1,6 @@
 // Change the color of a button clicked base  on whether or not the button containts the correct answer
 function checkAnswer(user_answer) {
 	const correctAnswers = ["Python","TCP"];
-	console.log(user_answer)
 	return correctAnswers.includes(user_answer);
 
 }

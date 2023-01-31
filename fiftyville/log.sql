@@ -53,7 +53,7 @@ WHERE suspects.passport_number IN (
  	WHERE day = 29 AND month = 7 AND year = 2021);
 --
 --Get suspects that are in more than one source 
-SELECT id
+SELECT *  
 FROM suspects
 WHERE id IN (
 	SELECT id 
@@ -69,18 +69,18 @@ AND id  IN (
 ;
 
 --Get the data from the flights 
-SELECT * FROM  suspects
-JOIN passengers ON suspects.passport_number = passengers.passport_number 
+SELECT * FROM  suspects JOIN passengers ON suspects.passport_number = passengers.passport_number 
 JOIN flights ON  passengers.flight_id = flights.id
 JOIN airports ON flights.destination_airport_id = airports.id
+WHERE day = 29 AND month = 7 AND year = 2021
 
 --Get the accomplice 
-SELECT name FROM people 
-WHERE phone_number IN ( 
-	SELECT receiver FROM phone_calls 
-	WHERE caller IN ( 
-		SELECT phone_number FROM people 
-		WHERE  id  IN ( 
-			SELECT id FROM suspects 
-			WHERE name = 'Bruce')
-	AND day = 28 AND month = 7 AND year =  2021)); 
+SELECT *  
+FROM people 
+JOIN phone_calls ON phone_calls.receiver =  people.phone_number 
+WHERE caller IN (
+	SELECT phone_number
+	FROM suspects ) 
+AND day = 28 AND month = 7 AND year = 2021
+AND duration < 60
+;
