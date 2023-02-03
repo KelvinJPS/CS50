@@ -87,7 +87,6 @@ def buy():
     VALUES (?,?,?,?,?)"""
     db.execute(purchase_query,session["user_id"],symbol,shares,stock_price,datetime.utcnow())
     db.execute("UPDATE users SET cash = ? ", user["cash"] - (stock_price  * shares) )
-    :
     return redirect("/")
 
 @app.route("/history")
