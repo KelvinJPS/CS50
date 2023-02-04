@@ -41,18 +41,13 @@ def after_request(response):
 @login_required
 def index():
     """Show portfolio of stocks"""
-    purchases = db.execute("SELECT * FROM purchases WHERE userid = ?", session["user_id"])
-    user_stocks = {}
-    # Populate user_stocks
-    for purchase in purchases:
-        symbol = purchase["symbol"]
-        shares = purchase["shares"]
-        if symbol in user_stocks: 
-            user_stocks[symbol] += shares 
-        else:
-            user_stocks[symbol] = shares
+    user_stocks = db.execute("SELECT symbol, SUM(shares) as shares FROM purchases WHERE userid = ? GROUP BY symbol ", session["user_id"])
+    for user_stock in user_stocks:
+        user_stock["price"] = lookup(user_stock["symbol"])["price"]
+        user_stock["total"] = user_stock["price"] * user_stock["shares"]
 
-    # cash = db.execute("SELECT cash FROM  users WHERE id = ?", session["user_id"])
+    # Populate user_stocks
+    cash = db.execute("SELECT cash FROM users WHERE id = ?", session["user_id"])
     print(user_stocks)
 
     return apology("TODO")
