@@ -42,10 +42,18 @@ def after_request(response):
 def index():
     """Show portfolio of stocks"""
     purchases = db.execute("SELECT * FROM purchases WHERE userid = ?", session["user_id"])
+    user_stocks = {}
+    # Populate user_stocks
     for purchase in purchases:
-       purchase["current price"] = lookup(purchase["symbol"])
+        symbol = purchase["symbol"]
+        shares = purchase["shares"]
+        if symbol in user_stocks: 
+            user_stocks[symbol] += shares 
+        else:
+            user_stocks[symbol] = shares
 
-    cash = db.execute("SELECT cash FROM users WHERE id = ?", session["user_id"])
+    # cash = db.execute("SELECT cash FROM  users WHERE id = ?", session["user_id"])
+    print(user_stocks)
 
     return apology("TODO")
 
@@ -113,7 +121,6 @@ def login():
         # Ensure password was submitted
         elif not request.form.get("password"):
             return apology("must provide password", 403)
-
         # Query database for username
         rows = db.execute("SELECT * FROM users WHERE username = ?", request.form.get("username"))
 
