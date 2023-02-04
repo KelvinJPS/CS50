@@ -42,15 +42,15 @@ def after_request(response):
 def index():
     """Show portfolio of stocks"""
     user_stocks = db.execute("SELECT symbol, SUM(shares) as shares FROM purchases WHERE userid = ? GROUP BY symbol ", session["user_id"])
+    cash = db.execute("SELECT cash FROM users WHERE id = ?", session["user_id"])
+    grand_total = cash
+    #Get current price and total 
     for user_stock in user_stocks:
         user_stock["price"] = lookup(user_stock["symbol"])["price"]
         user_stock["total"] = user_stock["price"] * user_stock["shares"]
+        grand_total += user_stock["total"]
 
-    # Populate user_stocks
-    cash = db.execute("SELECT cash FROM users WHERE id = ?", session["user_id"])
-    print(user_stocks)
-
-    return apology("TODO")
+    return render_template("index.html")
 
 
 
