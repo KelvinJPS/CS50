@@ -200,13 +200,28 @@ def register():
 @login_required
 def sell():
     """Sell shares of stock"""
+
+    if request.method == "GET":
+        user_stocks = db.execute("SELECT symbol FROM purchases WHERE userid = ?", session["user_id"])
+        return render_template("sell.html")
     #Input validation
-    if not request.form.get("symbo"):
+    if not request.form.get("symbol"):
         apology("symbol required")
 
     if not request.form.get("shares"):
         apology("number of shares required")
 
-    user_stocks = db.execute("SELECT symbol FROM purchases WHERE userid = ?", session["user_id"])
-    
+    # assign variables
+    shares = 0
+    symbol = request.form.get("symbol")
+    price = lookup(symbol)["price"]
+    date = datetime.utcnow()
+    try:
+        shares = int(request.form.get("shares"))
+    except ValueError:
+        return apology("shares is not a number")
+    # Validate sell
+    sell_query = """INSERT INTO sells (userid, symbol, shares, price, date) 
+    VALUES (?,?,?,?,?)"""
+    db.execute(sell_query,session["user_id"],request.form.get("symbol"),  )
     return apology("TODO")
