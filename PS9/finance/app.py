@@ -200,4 +200,13 @@ def register():
 @login_required
 def sell():
     """Sell shares of stock"""
+    #Input validation
+    if not request.form.get("symbo"):
+        apology("symbol required")
+
+    if not request.form.get("shares"):
+        apology("number of shares required")
+
+    user_stocks = db.execute("SELECT symbol FROM purchases WHERE userid = ?", session["user_id"])
+    
     return apology("TODO")
