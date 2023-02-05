@@ -224,8 +224,7 @@ def sell():
     rows = db.execute("SELECT symbol FROM purchases WHERE userid = ? AND shares !=0  GROUP BY symbol", session["user_id"], symbol)
     if not rows:
         return apology("user does not posses shares for that symbol")
-    # Find symbol 
     sell_query = """INSERT INTO sells (userid, symbol, shares, price, date) 
     VALUES (?,?,?,?,?)"""
-    db.execute(sell_query,session["user_id"],request.form.get("symbol"),  )
+    db.execute(sell_query,session["user_id"],symbol,shares,price,date)
     return apology("TODO")
