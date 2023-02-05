@@ -4,29 +4,29 @@
 <table class="table table-striped">
 	<thead>
 		<tr>
-			<th class="text-start">Symbol</th>
-			<th class="text-start">Name</th>
-			<th class="text-end">Shares</th>
-			<th class="text-end">Price</th>
-			<th class="text-end">TOTAL</th>
+			<th>Symbol</th>
+			<th>Name</th>
+			<th>Shares</th>
+			<th>Price</th>
+			<th>TOTAL</th>
 		</tr>
 	</thead>
 	<tbody>
 		{% for user_stock in user_stocks %}
 		<tr>
-			<td class="text-start">
+			<td>
 				{{user_stock.symbol}}
 			</td>
-			<td class="text-start">
+			<td>
 				{{ user_stock.name }}
 			</td>
-			<td class="text-start">
+			<td>
 				{{ user_stock.shares }}
 			</td>
-			<td class="text-start">
+			<td>
 				{{ user_stock.price }}
 			</td>
-			<td class="text-start">
+			<td>
 				{{ user_stock.total }}
 			</td>
 		</tr>
