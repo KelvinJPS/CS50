@@ -1,0 +1,15 @@
+{% extends "layout.html" %}
+{% block main %}
+<form>
+	<div class="mb-3">
+		<select name="stock" id="stock-selector">
+			{% for stock in user_stocks %}
+
+			{% endfor %}
+		</select>
+		<input required class="form-control mx-auto w-auto" id="shares" name="shares" placeholder="shares" type="number">
+		<button class="btn btn-primary" type="submit">sell</button>
+	</div>
+</form>
+{<input> name
+{% endblock %}
