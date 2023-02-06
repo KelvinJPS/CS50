@@ -1,6 +1,6 @@
 import os
+from dateutil import tz
 from sys import exception
-
 from cs50 import SQL
 from flask import Flask, flash, redirect, render_template, request, session
 from flask_session import Session
@@ -100,8 +100,15 @@ def buy():
 @app.route("/history")
 @login_required
 def history():
-    """Show history of transactions"""
-    return apology("TODO")
+    """Show history of transactions"""    
+    purchases = db.execute("SELECT * FROM purchases WHERE userid = ?", session["user_id"])
+    sells = db.execute("SELECT * FROM sells WHERE userid = ?", session["user_id"])
+    # Convert utc time  to user's local time
+    local_time_zone = tz.tzlocal()
+    for purchase, sell in zip(purchases,sells):
+        purchase["date"].replace(tzinfo=tz.tzutc()).astimezone(local_time_zone)
+
+    return render_template("history.html",purchases=purchases,sells=sells)
 
 
 @app.route("/login", methods=["GET", "POST"])
@@ -165,7 +172,6 @@ def quote():
     quote = lookup(stock)
     if not lookup(stock):
         return apology("invalid symbol")
-
 
     return render_template("quoted.html",quote=quote)
 
