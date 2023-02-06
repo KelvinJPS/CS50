@@ -86,8 +86,14 @@ def buy():
     shares = int(shares)
     purchase_query = """INSERT INTO purchases (userid, symbol, shares, price, date) 
     VALUES (?,?,?,?,?)"""
+    symbol_portfolio = db.execute("SELECT symbol FROM portfolio WHERE userid = ?",session["user_id"])
+    # Make new record 
+    if not symbol_portfolio:
+        db.execute("INSERT INTO portfolio (userid,symbol,shares)",session["user_id"], symbol, shares )
+    # Update
     db.execute(purchase_query,session["user_id"],symbol,shares,stock_price,datetime.utcnow())
     db.execute("UPDATE users SET cash = ? ", user["cash"] - (stock_price  * shares) )
+    db.execute("UPDATE portfolio SET shares += ?",shares )
     return redirect("/")
 
 @app.route("/history")
