@@ -240,4 +240,4 @@ def sell():
     VALUES (?,?,?,?,?)"""
     db.execute(sell_query,session["user_id"],symbol,shares,price,date)
     db.execute("UPDATE portfolio SET shares -= ?",shares)
-    return apology("TODO")
+    return redirect("/")
