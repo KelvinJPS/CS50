@@ -41,7 +41,7 @@ def after_request(response):
 @login_required
 def index():
     """Show portfolio of stocks"""
-    user_stocks = db.execute("SELECT symbol, SUM(shares) as shares FROM purchases WHERE userid = ? GROUP BY symbol ", session["user_id"])
+    user_stocks = db.execute("SELECT stock, shares FROM portfolio WHERE user_id = ? ", session["user_id"])
     cash = db.execute("SELECT cash FROM users WHERE id = ?", session["user_id"])[0]["cash"]
     grand_total = cash
       #Get current price and total 
