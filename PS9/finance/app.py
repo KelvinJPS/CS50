@@ -235,7 +235,9 @@ def sell():
         return apology("There is a problem getting the user's shares",400)
     if user_shares < 0 :
         return apology("user does not posses shares for that symbol")
+    # Add sell 
     sell_query = """INSERT INTO sells (userid, symbol, shares, price, date) 
     VALUES (?,?,?,?,?)"""
     db.execute(sell_query,session["user_id"],symbol,shares,price,date)
+    db.execute("UPDATE portfolio SET shares -= ?",shares)
     return apology("TODO")
