@@ -1,4 +1,5 @@
 import os
+from sys import exception
 
 from cs50 import SQL
 from flask import Flask, flash, redirect, render_template, request, session
@@ -227,8 +228,12 @@ def sell():
     except ValueError:
         return apology("shares is not a number")
     # Validate sell
-    rows = db.execute("SELECT symbol FROM purchases WHERE userid = ? AND shares !=0  GROUP BY symbol", session["user_id"], symbol)
-    if not rows:
+    user_shares = 0
+    try:
+        user_shares = int(db.execute("SELECT shares FROM portfolio WHERE userid = ? AND symbol = ?",session["user_id"], symbol)[0])
+    except ValueError:
+        return apology("There is a problem getting the user's shares",400)
+    if user_shares < 0 :
         return apology("user does not posses shares for that symbol")
     sell_query = """INSERT INTO sells (userid, symbol, shares, price, date) 
     VALUES (?,?,?,?,?)"""
