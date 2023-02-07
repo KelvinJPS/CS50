@@ -1,6 +1,5 @@
 import os
-from dateutil import tz
-from sys import exception
+
 from cs50 import SQL
 from flask import Flask, flash, redirect, render_template, request, session
 from flask_session import Session
@@ -42,14 +41,14 @@ def after_request(response):
 @login_required
 def index():
     """Show portfolio of stocks"""
-    user_stocks = db.execute("SELECT stock, shares FROM portfolio WHERE user_id = ? ", session["user_id"])
+    user_stocks = db.execute("SELECT stock, shares FROM portfolio WHERE userid = ? ", session["user_id"])
     cash = db.execute("SELECT cash FROM users WHERE id = ?", session["user_id"])[0]["cash"]
     grand_total = cash
       #Get current price and total 
     for user_stock in user_stocks:
-        user_stock["price"] = lookup(user_stock["symbol"])["price"]
+        user_stock["price"] = lookup(user_stock["stock"])["price"]
         user_stock["total"] = user_stock["price"] * user_stock["shares"]
-        user_stock["name"] = lookup(user_stock["symbol"])["name"]
+        user_stock["name"] = lookup(user_stock["stock"])["name"]
         grand_total += user_stock["total"]
     return render_template("index.html",user_stocks=user_stocks,cash=cash,grand_total=grand_total) 
 
@@ -87,14 +86,14 @@ def buy():
     shares = int(shares)
     purchase_query = """INSERT INTO purchases (userid, symbol, shares, price, date) 
     VALUES (?,?,?,?,?)"""
-    symbol_portfolio = db.execute("SELECT symbol FROM portfolio WHERE userid = ?",session["user_id"])
+    symbol_portfolio = db.execute("SELECT stock FROM portfolio WHERE userid = ?",session["user_id"])
     # Make new record 
     if not symbol_portfolio:
-        db.execute("INSERT INTO portfolio (userid,symbol,shares)",session["user_id"], symbol, shares )
+        db.execute("INSERT INTO portfolio (userid,stock,shares) VALUES (?,?,?)",session["user_id"], symbol, shares )
     # Update
     db.execute(purchase_query,session["user_id"],symbol,shares,stock_price,datetime.utcnow())
     db.execute("UPDATE users SET cash = ? ", user["cash"] - (stock_price  * shares) )
-    db.execute("UPDATE portfolio SET shares += ?",shares )
+    db.execute("UPDATE portfolio SET shares =+ ? WHERE userid = ?",shares,session["user_id"] )
     return redirect("/")
 
 @app.route("/history")
@@ -103,12 +102,9 @@ def history():
     """Show history of transactions"""    
     purchases = db.execute("SELECT * FROM purchases WHERE userid = ?", session["user_id"])
     sells = db.execute("SELECT * FROM sells WHERE userid = ?", session["user_id"])
-    # Convert utc time  to user's local time
-    local_time_zone = tz.tzlocal()
     for purchase, sell in zip(purchases,sells):
-        purchase["date"].replace(tzinfo=tz.tzutc()).astimezone(local_time_zone)
-
-    return render_template("history.html",purchases=purchases,sells=sells)
+        purchase["datetime"]
+    return render_template("history.html",)
 
 
 @app.route("/login", methods=["GET", "POST"])
@@ -172,6 +168,7 @@ def quote():
     quote = lookup(stock)
     if not lookup(stock):
         return apology("invalid symbol")
+
 
     return render_template("quoted.html",quote=quote)
 
