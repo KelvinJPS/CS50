@@ -233,11 +233,11 @@ def sell():
     # Validate sell
     user_shares = 0
     try:
-        user_shares = int(db.execute("SELECT shares FROM portfolio WHERE userid = ? AND stock= ?",session["user_id"], symbol)
+        user_shares = int(db.execute("SELECT shares FROM portfolio WHERE userid = ? AND stock= ? AND shares > 0",session["user_id"], symbol)
                         [0]["shares"])
     except ValueError:
         return apology("There is a problem getting the user's shares",400)
-    if user_shares < 0 :
+    if user_shares <= 0 or shares > user_shares :
         return apology("user does not posses shares for that symbol",400)
     # Add sell 
     sell_query = """INSERT INTO sells (userid, symbol, shares, price, date) 
