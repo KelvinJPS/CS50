@@ -71,8 +71,8 @@ def buy():
         return apology("stock doesn't exists")
 
     try :
-        if int(shares) < 0:
-            return apology("shares is not a positive number")
+        if int(shares) <= 0:
+            return apology("shares is not a positive number or is 0")
     except ValueError:
         return apology("shares is not a number")
 
@@ -86,14 +86,14 @@ def buy():
     shares = int(shares)
     purchase_query = """INSERT INTO purchases (userid, symbol, shares, price, date) 
     VALUES (?,?,?,?,?)"""
-    symbol_portfolio = db.execute("SELECT stock FROM portfolio WHERE userid = ?",session["user_id"])
-    # Make new record 
-    if not symbol_portfolio:
-        db.execute("INSERT INTO portfolio (userid,stock,shares) VALUES (?,?,?)",session["user_id"], symbol, shares )
-    # Update
     db.execute(purchase_query,session["user_id"],symbol,shares,stock_price,datetime.utcnow())
-    db.execute("UPDATE users SET cash = ? ", user["cash"] - (stock_price  * shares) )
-    db.execute("UPDATE portfolio SET shares =+ ? WHERE userid = ?",shares,session["user_id"] )
+    db.execute("UPDATE users SET cash  = ? ", user["cash"] - (stock_price  * shares) )
+    symbol_portfolio = db.execute("SELECT stock FROM portfolio WHERE userid = ? AND stock = ?",session["user_id"],symbol)
+    if not symbol_portfolio:
+        db.execute("INSERT INTO portfolio (userid,stock,shares) VALUES (?,?,?)",session["user_id"], symbol, shares)
+        return redirect("/")
+    # Update if doesnt exists
+    db.execute("UPDATE portfolio SET shares = shares + ? WHERE userid = ? AND stock = ?",shares,session["user_id"],symbol )
     return redirect("/")
 
 @app.route("/history")
@@ -212,7 +212,7 @@ def sell():
     """Sell shares of stock"""
 
     if request.method == "GET":
-        user_stocks = db.execute("SELECT stock FROM portfolio WHERE userid = ?", session["user_id"])
+        user_stocks = db.execute("SELECT stock FROM portfolio WHERE userid = ? AND shares > 0", session["user_id"])
         return render_template("sell.html",user_stocks=user_stocks)
     #Input validation
     if not request.form.get("symbol"):
@@ -231,17 +231,14 @@ def sell():
     except ValueError:
         return apology("shares is not a number")
     # Validate sell
-    user_shares = 0
-    try:
-        user_shares = int(db.execute("SELECT shares FROM portfolio WHERE userid = ? AND stock= ? AND shares > 0",session["user_id"], symbol)
-                        [0]["shares"])
-    except ValueError:
-        return apology("There is a problem getting the user's shares",400)
-    if user_shares <= 0 or shares > user_shares :
+    user_shares = db.execute("SELECT shares FROM portfolio WHERE userid = ? AND stock= ? AND shares >= ?",
+            session["user_id"], symbol,shares)
+    if not user_shares:
         return apology("user does not posses shares for that symbol",400)
     # Add sell 
     sell_query = """INSERT INTO sells (userid, symbol, shares, price, date) 
     VALUES (?,?,?,?,?)"""
     db.execute(sell_query,session["user_id"],symbol,shares,price,date)
-    db.execute("UPDATE portfolio SET shares =- ?",shares)
+    db.execute("UPDATE portfolio SET shares = shares - ? WHERE userid = ? AND stock = ?",shares,session["user_id"], symbol)
+    db.execute("UPDATE users SET cash = cash + ? WHERE id = ? ",(shares * price),session["user_id"])
     return redirect("/")
