@@ -5,7 +5,7 @@
 		<select name="symbol" id="stock-selector">
 			{% for stock in user_stocks %}
 			<option>
-				{{stock}}
+				{{stock.stock}}
 			</option>
 			{% endfor %}
 		</select>

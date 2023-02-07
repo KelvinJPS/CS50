@@ -169,7 +169,7 @@ def quote():
     if not lookup(stock):
         return apology("invalid symbol")
 
-
+    
     return render_template("quoted.html",quote=quote)
 
 
@@ -212,8 +212,8 @@ def sell():
     """Sell shares of stock"""
 
     if request.method == "GET":
-        user_stocks = db.execute("SELECT symbol FROM purchases WHERE userid = ?", session["user_id"])
-        return render_template("sell.html")
+        user_stocks = db.execute("SELECT stock FROM portfolio WHERE userid = ?", session["user_id"])
+        return render_template("sell.html",user_stocks=user_stocks)
     #Input validation
     if not request.form.get("symbol"):
         apology("symbol required")
@@ -233,14 +233,15 @@ def sell():
     # Validate sell
     user_shares = 0
     try:
-        user_shares = int(db.execute("SELECT shares FROM portfolio WHERE userid = ? AND symbol = ?",session["user_id"], symbol)[0])
+        user_shares = int(db.execute("SELECT shares FROM portfolio WHERE userid = ? AND stock= ?",session["user_id"], symbol)
+                        [0]["shares"])
     except ValueError:
         return apology("There is a problem getting the user's shares",400)
     if user_shares < 0 :
-        return apology("user does not posses shares for that symbol")
+        return apology("user does not posses shares for that symbol",400)
     # Add sell 
     sell_query = """INSERT INTO sells (userid, symbol, shares, price, date) 
     VALUES (?,?,?,?,?)"""
     db.execute(sell_query,session["user_id"],symbol,shares,price,date)
-    db.execute("UPDATE portfolio SET shares -= ?",shares)
+    db.execute("UPDATE portfolio SET shares =- ?",shares)
     return redirect("/")
