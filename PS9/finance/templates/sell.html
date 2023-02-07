@@ -4,7 +4,9 @@
 	<div class="mb-3">
 		<select name="symbol" id="stock-selector">
 			{% for stock in user_stocks %}
-
+			<option>
+				{{stock}}
+			</option>
 			{% endfor %}
 		</select>
 		<input required class="form-control mx-auto w-auto" id="shares" name="shares" placeholder="shares" type="number">
