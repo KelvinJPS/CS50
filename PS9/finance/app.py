@@ -44,15 +44,16 @@ def index():
     user_stocks = db.execute("SELECT stock, shares FROM portfolio WHERE userid = ? ", session["user_id"])
     cash = db.execute("SELECT cash FROM users WHERE id = ?", session["user_id"])[0]["cash"]
     grand_total = cash
-      #Get current price and total 
+    # Get current price and total 
     for user_stock in user_stocks:
         user_stock["price"] = lookup(user_stock["stock"])["price"]
         user_stock["total"] = user_stock["price"] * user_stock["shares"]
         user_stock["name"] = lookup(user_stock["stock"])["name"]
         grand_total += user_stock["total"]
-    return render_template("index.html",user_stocks=user_stocks,cash=cash,grand_total=grand_total) 
+    return render_template("index.html", user_stocks=user_stocks, cash=cash, grand_total=grand_total) 
 
-@app.route("/buy", methods=["POST","GET"])
+
+@app.route("/buy", methods=["POST", "GET"])
 @login_required
 def buy():
     """Buy shares of stock"""
@@ -63,14 +64,14 @@ def buy():
     symbol = request.form.get("symbol")
     shares = request.form.get("shares")
 
-    #Input validation
+    # Input validation
     if not symbol:
         return apology("stock's symbol required")
 
     if not lookup(symbol):
         return apology("stock doesn't exists")
 
-    try :
+    try:
         if int(shares) <= 0:
             return apology("shares is not a positive number or is 0")
     except ValueError:
@@ -78,33 +79,34 @@ def buy():
 
     # validate purchase
     stock_price = lookup(symbol)["price"]
-    user = db.execute("SELECT * FROM users WHERE id = ?",session["user_id"])[0]
+    user = db.execute("SELECT * FROM users WHERE id = ?", session["user_id"])[0]
     if stock_price > user["cash"]:
         return apology("insufficient funds")
 
-    #purchase     
+    # purchase     
     shares = int(shares)
-    purchase_query = """INSERT INTO purchases (userid, symbol, shares, price, date) 
+    purchase_query = """INSERT INTO transactions (userid, symbol, shares, price, date, transaction_type) 
     VALUES (?,?,?,?,?)"""
-    db.execute(purchase_query,session["user_id"],symbol,shares,stock_price,datetime.utcnow())
-    db.execute("UPDATE users SET cash  = ? ", user["cash"] - (stock_price  * shares) )
-    symbol_portfolio = db.execute("SELECT stock FROM portfolio WHERE userid = ? AND stock = ?",session["user_id"],symbol)
+    db.execute(purchase_query, session["user_id"], symbol, shares, stock_price, datetime.utcnow(),"buy")
+    db.execute("UPDATE users SET cash  = ? ", user["cash"] - (stock_price*shares) )
+    symbol_portfolio = db.execute("SELECT stock FROM portfolio WHERE userid = ? AND stock = ?", session["user_id"],symbol)
     if not symbol_portfolio:
-        db.execute("INSERT INTO portfolio (userid,stock,shares) VALUES (?,?,?)",session["user_id"], symbol, shares)
+        db.execute("INSERT INTO portfolio (userid,stock,shares) VALUES (?,?,?)", session["user_id"], symbol, shares)
         return redirect("/")
     # Update if doesnt exists
-    db.execute("UPDATE portfolio SET shares = shares + ? WHERE userid = ? AND stock = ?",shares,session["user_id"],symbol )
+    db.execute("UPDATE portfolio SET shares = shares + ? WHERE userid = ? AND stock = ?", shares, session["user_id"], symbol)
     return redirect("/")
 
 @app.route("/history")
 @login_required
 def history():
     """Show history of transactions"""    
-    purchases = db.execute("SELECT * FROM purchases WHERE userid = ?", session["user_id"])
-    sells = db.execute("SELECT * FROM sells WHERE userid = ?", session["user_id"])
-    for purchase, sell in zip(purchases,sells):
-        purchase["datetime"]
-    return render_template("history.html",)
+    transactions = db.execute("""SELECT *
+                              FROM transactions
+                              WHERE userid=?
+                              ORDER BY date;
+                              """,session["user_id"])
+    return render_template("history.html",transactions=transactions)
 
 
 @app.route("/login", methods=["GET", "POST"])
@@ -236,9 +238,9 @@ def sell():
     if not user_shares:
         return apology("user does not posses shares for that symbol",400)
     # Add sell 
-    sell_query = """INSERT INTO sells (userid, symbol, shares, price, date) 
+    sell_query = """INSERT INTO transactions (userid, symbol, shares, price, date) 
     VALUES (?,?,?,?,?)"""
-    db.execute(sell_query,session["user_id"],symbol,shares,price,date)
+    db.execute(sell_query,session["user_id"],symbol,shares,price,date,"sell")
     db.execute("UPDATE portfolio SET shares = shares - ? WHERE userid = ? AND stock = ?",shares,session["user_id"], symbol)
     db.execute("UPDATE users SET cash = cash + ? WHERE id = ? ",(shares * price),session["user_id"])
     return redirect("/")

@@ -4,6 +4,25 @@
 <table class="table table-striped">
 	<thead>
 		<tr>
+			<td>Symbol</td>
+			<td>Shares</td>
+			<td>Price</td>
+			<td>Transacted</td>
 		</tr>
 	</thead>
+	<tbody>
+		{% for transaction in transactions %}
+		<tr>
+			<td>{{transaction.symbol}}</td>
+			{% if transaction.transaction_type == "sell" %}
+			<td>-{{transaction.shares}}</td>
+			{% else %}
+			<td>{{transaction.shares}}</td>
+			{% endif %}
+			<td>{{transaction.price}}</td>
+			<td>{{transaction.date}}</td>
+		</tr>
+		{% endfor %}
+	</tbody>
 </table>
+{% endblock %}

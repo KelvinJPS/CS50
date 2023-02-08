@@ -7,4 +7,4 @@ CREATE TABLE transactions(
     price      INTEGER NOT NULL,
     FOREIGN KEY(userid) REFERENCES users(id)
 );
-CREATE UNIQUE INDEX id ON transaction(purchaseid);
+CREATE UNIQUE INDEX id ON transactions (id);
