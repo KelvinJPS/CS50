@@ -86,16 +86,17 @@ def buy():
     # purchase     
     shares = int(shares)
     purchase_query = """INSERT INTO transactions (userid, symbol, shares, price, date, transaction_type) 
-    VALUES (?,?,?,?,?)"""
-    db.execute(purchase_query, session["user_id"], symbol, shares, stock_price, datetime.utcnow(),"buy")
-    db.execute("UPDATE users SET cash  = ? ", user["cash"] - (stock_price*shares) )
-    symbol_portfolio = db.execute("SELECT stock FROM portfolio WHERE userid = ? AND stock = ?", session["user_id"],symbol)
+    VALUES (?,?,?,?,?,?)"""
+    db.execute(purchase_query, session["user_id"], symbol, shares, stock_price, datetime.utcnow(), "buy")
+    db.execute("UPDATE users SET cash  = ? ", user["cash"] - (stock_price*shares))
+    symbol_portfolio = db.execute("SELECT stock FROM portfolio WHERE userid = ? AND stock = ?", session["user_id"], symbol)
     if not symbol_portfolio:
         db.execute("INSERT INTO portfolio (userid,stock,shares) VALUES (?,?,?)", session["user_id"], symbol, shares)
         return redirect("/")
     # Update if doesnt exists
     db.execute("UPDATE portfolio SET shares = shares + ? WHERE userid = ? AND stock = ?", shares, session["user_id"], symbol)
     return redirect("/")
+
 
 @app.route("/history")
 @login_required
@@ -105,8 +106,8 @@ def history():
                               FROM transactions
                               WHERE userid=?
                               ORDER BY date;
-                              """,session["user_id"])
-    return render_template("history.html",transactions=transactions)
+                              """, session["user_id"])
+    return render_template("history.html", transactions=transactions)
 
 
 @app.route("/login", methods=["GET", "POST"])
@@ -159,20 +160,17 @@ def logout():
 @login_required
 def quote():
     """Get stock quote."""
-    #Get user input 
+    # Get user input 
     if request.method == "GET":
         return render_template("quote.html")
 
     if not request.form.get("symbol"):
         return apology("missing symbol")
-
     stock = request.form.get("symbol")
     quote = lookup(stock)
     if not lookup(stock):
         return apology("invalid symbol")
-
-    
-    return render_template("quoted.html",quote=quote)
+    return render_template("quoted.html", quote=quote)
 
 
 @app.route("/register", methods=["GET", "POST"])
@@ -185,7 +183,7 @@ def register():
     username = request.form.get("username")
     password = request.form.get("password")
     confirmation = request.form.get("confirmation")
-    user_found = db.execute("SELECT username FROM users WHERE username = ? ", username )
+    user_found = db.execute("SELECT username FROM users WHERE username = ? ", username)
     
     if not username:
         return apology("username required")
@@ -194,20 +192,17 @@ def register():
         return apology("username already exists")
 
     if not password:
-            return apology("password required")
+        return apology("password required")
 
     if confirmation != password:
         return apology("passwords don't match")
 
     password_hash = generate_password_hash(password)
     db.execute("INSERT INTO users (username, hash) VALUES (?,?)", 
-              username, password_hash) 
+               username, password_hash) 
     return redirect("/")
 
-     
-
-
-
+    
 @app.route("/sell", methods=["GET", "POST"])
 @login_required
 def sell():
@@ -215,8 +210,8 @@ def sell():
 
     if request.method == "GET":
         user_stocks = db.execute("SELECT stock FROM portfolio WHERE userid = ? AND shares > 0", session["user_id"])
-        return render_template("sell.html",user_stocks=user_stocks)
-    #Input validation
+        return render_template("sell.html", user_stocks=user_stocks)
+    # Input validation
     if not request.form.get("symbol"):
         apology("symbol required")
 
@@ -234,13 +229,13 @@ def sell():
         return apology("shares is not a number")
     # Validate sell
     user_shares = db.execute("SELECT shares FROM portfolio WHERE userid = ? AND stock= ? AND shares >= ?",
-            session["user_id"], symbol,shares)
+                             session["user_id"], symbol, shares)
     if not user_shares:
-        return apology("user does not posses shares for that symbol",400)
+        return apology("user does not posses shares for that symbol", 400)
     # Add sell 
-    sell_query = """INSERT INTO transactions (userid, symbol, shares, price, date) 
-    VALUES (?,?,?,?,?)"""
-    db.execute(sell_query,session["user_id"],symbol,shares,price,date,"sell")
-    db.execute("UPDATE portfolio SET shares = shares - ? WHERE userid = ? AND stock = ?",shares,session["user_id"], symbol)
-    db.execute("UPDATE users SET cash = cash + ? WHERE id = ? ",(shares * price),session["user_id"])
+    sell_query = """INSERT INTO transactions (userid, symbol, shares, price, date,transaction_type) 
+    VALUES (?,?,?,?,?,?)"""
+    db.execute(sell_query, session["user_id"], symbol, shares, price, date, "sell")
+    db.execute("UPDATE portfolio SET shares = shares - ? WHERE userid = ? AND stock = ?", shares, session["user_id"], symbol)
+    db.execute("UPDATE users SET cash = cash + ? WHERE id = ? ", (shares * price), session["user_id"])
     return redirect("/")
